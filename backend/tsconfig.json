@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es6", // 어떤 버전으로 컴파일할지 작성
+    "module": "commonjs", //어떤 모듈 방식으로 컴파일할지 설정
+    "outDir": "./dist", //컴파일 후 js 파일들이 생성되는 곳
+    "rootDir": ".", //루트 폴더
+    "strict": true, //strict 옵션 활성화
+    "moduleResolution": "node", //모듈 해석 방법 설정: 'node' (Node.js)
+    "allowSyntheticDefaultImports": true /* default export가 없는 모듈에서 default imports를 허용 */,
+    "esModuleInterop": true /* 'require'와 'import' 호환 */,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/*"],
+      "@config/*": ["src/config/*"],
+      "@loader/*": ["src/loader/*"],
+      "@common/*": ["src/common/*"],
+      "@utils/*": ["src/utils/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
