@@ -6,10 +6,10 @@ import { ResultCode } from '@common/index';
 import { Response } from 'express';
 
 const errorResponse = (res: Response, errorCode: IResponse) => {
-  res.status(errorCode.status).json({
+  res.status(errorCode.status || 500).json({
     error: {
       code: errorCode.code || ResultCode.UNKNOWN.code,
-      message: errorCode.message,
+      message: errorCode.message || ResultCode.UNKNOWN.message,
     },
   });
 };

@@ -8,15 +8,19 @@
     "moduleResolution": "node", //모듈 해석 방법 설정: 'node' (Node.js)
     "allowSyntheticDefaultImports": true /* default export가 없는 모듈에서 default imports를 허용 */,
     "esModuleInterop": true /* 'require'와 'import' 호환 */,
+    "strictPropertyInitialization": false,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],
+      "@calculator/*": ["src/calculator/*"],
       "@config/*": ["src/config/*"],
-      "@loader/*": ["src/loader/*"],
       "@common/*": ["src/common/*"],
+      "@feed/*": ["src/feed/*"],
+      "@loader/*": ["src/loader/*"],
       "@utils/*": ["src/utils/*"]
     }
   },

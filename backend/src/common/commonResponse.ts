@@ -3,7 +3,7 @@ import { IResponse } from './resultCode';
 import { Response } from 'express';
 
 const commonResponse = (res: Response, resultCode: IResponse, data?: any) => {
-  res.status(resultCode.status).json({
+  res.status(200).json({
     data,
   });
 };

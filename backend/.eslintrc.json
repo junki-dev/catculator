@@ -50,8 +50,10 @@
       "alias": {
         "map": [
           ["@src", "./src"],
+          ["@calculator", "./src/calculator"],
           ["@config", "./src/config"],
           ["@common", "./src/common"],
+          ["@feed", "./src/feed"],
           ["@loader", "./src/loader"],
           ["@utils", "./src/utils"]
         ]
