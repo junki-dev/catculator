@@ -2,7 +2,7 @@ name: Saturn contract deployer test
 
 on:
   pull_request:
-    branches: ['main', 'develop', 'feature/**', 'hotfix/**', 'release/**']
+    branches: ['main', 'develop', 'be/**', 'fe/**']
 
 jobs:
   coverage:
