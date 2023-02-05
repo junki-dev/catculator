@@ -1,7 +1,9 @@
+/** @jsxImportSource @emotion/react */
+import Footer from './Footer';
+
+import { css } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
 
-import Footer from './Footer';
-import Header from './Header';
 
 interface LayoutDefaultProps {
   children?: React.ReactElement;
@@ -10,8 +12,7 @@ interface LayoutDefaultProps {
 export default function Layout({ children }: LayoutDefaultProps) {
   return (
     <div>
-      <Header />
-      <main>{children || <Outlet />}</main>
+      <main css={css({ backgroundColor: '#ffffff' })}>{children || <Outlet />}</main>
       <Footer />
     </div>
   );

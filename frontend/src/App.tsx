@@ -1,11 +1,17 @@
+
 import Router from './routes';
 import GlobalStyle from './styles/global';
+import { theme } from './styles/teme';
+
+import { ThemeProvider } from '@mui/system';
 
 function App() {
   return (
     <>
-      <GlobalStyle />
-      <Router />
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <Router />
+      </ThemeProvider>
     </>
   );
 }
