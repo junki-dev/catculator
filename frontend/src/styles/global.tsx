@@ -1,10 +1,9 @@
-import React from 'react';
 import { Global, css } from '@emotion/react';
 
 const style = css`
   html {
     font-size: 16px;
-    background-color: #ffedcb;
+    background-color: '#ffffff';
   }
 
   body {
@@ -17,6 +16,12 @@ const style = css`
   textarea {
     border: 0;
     outline: 0 !important;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 `;
 

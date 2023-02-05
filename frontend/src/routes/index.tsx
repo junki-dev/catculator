@@ -1,9 +1,7 @@
-import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from '../layouts/Layout';
-import NotFound from '../pages/404';
-import Contact from '../pages/Contact';
 import Catculator from '../pages/Catculator';
+
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 export default function Router() {
   return (
@@ -11,15 +9,8 @@ export default function Router() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Catculator />} />
-          <Route
-            path="/contact"
-            element={
-              <React.Suspense fallback={<>...</>}>
-                <Contact />
-              </React.Suspense>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
+
+          <Route path="*" element={<Navigate to="/" />} />
         </Route>
       </Routes>
     </BrowserRouter>
