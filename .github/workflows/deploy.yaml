@@ -11,6 +11,7 @@ on:
     branches:
       - be/**
       - fe/**
+      - cm/**
 
 jobs:
   # if_merged:
