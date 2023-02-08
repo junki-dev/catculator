@@ -20,8 +20,10 @@ module.exports = {
     },
     alias: {
       '@src': path.resolve(__dirname, 'src'),
+      '@calculator': path.resolve(__dirname, 'src/calculator'),
       '@config': path.resolve(__dirname, 'src/config'),
       '@common': path.resolve(__dirname, 'src/common'),
+      '@feed': path.resolve(__dirname, 'src/feed'),
       '@loader': path.resolve(__dirname, 'src/loader'),
       '@utils': path.resolve(__dirname, 'src/utils'),
     },

@@ -11,9 +11,9 @@ export const getRer = async (weight: number): Promise<number> => {
 
   try {
     if (weight > 2) {
-      return Big(Math.pow(weight, 0.75)).mul(70).round().toNumber();
-    } else {
       return Big(30).mul(weight).plus(70).toNumber();
+    } else {
+      return Big(Math.pow(weight, 0.75)).mul(70).round().toNumber();
     }
   } catch (err) {
     logger.error(`failed to calculate RER. error=${err}`);

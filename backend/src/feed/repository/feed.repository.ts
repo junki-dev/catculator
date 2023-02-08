@@ -1,6 +1,6 @@
 import { Feed } from '../model/feed.entity';
 
-import { Database } from '@src/loader';
+import { Database } from '@loader/index';
 import { DataSource, Repository } from 'typeorm';
 
 class FeedRepository {
