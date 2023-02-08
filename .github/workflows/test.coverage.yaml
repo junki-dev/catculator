@@ -45,11 +45,14 @@ jobs:
           yarn test:sum
 
       - name: Make badges
-        run: yarn test:bad
+        run: |
+          cd backend
+          yarn test:bad
 
       - name: Check if there is any new translations
         id: verify_diff
         run: |
+          cd backend
           git diff --quiet README.md || echo "::set-output name=new_translations_exist::true"
 
       - name: Commit files
