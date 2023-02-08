@@ -1,10 +1,10 @@
 import { GetFeedAmountResDto } from './dto/response/get-feed-amount.dto';
-import { Feed } from './entity/feed.entity';
 
 import * as FeedRepository from '@feed/repository/feed.repository';
 import { app } from '@src/app';
-import { ResultCode } from '@src/common';
+import { ResultCode } from '@common/index';
 import request from 'supertest';
+import { Feed } from '@feed/model/feed.entity';
 
 describe('Calculator API Test', () => {
   describe('GET /calculator 는 ', () => {
@@ -16,7 +16,7 @@ describe('Calculator API Test', () => {
             .then((res) => {
               //* confirm expected value
               expect(res.statusCode).toStrictEqual(200);
-              expect(res.body.data).toStrictEqual(resGetFeedDtoKcal);
+              expect(res.body.data.info).toStrictEqual(resGetFeedDtoKcal);
               done();
             });
         });
@@ -34,7 +34,7 @@ describe('Calculator API Test', () => {
             .then((res) => {
               //* confirm expected value
               expect(res.statusCode).toStrictEqual(200);
-              expect(res.body.data).toStrictEqual(resGetFeedDtoFeedId);
+              expect(res.body.data.info).toStrictEqual(resGetFeedDtoFeedId);
               done();
             });
         });
@@ -95,15 +95,15 @@ describe('Calculator API Test', () => {
 // * Common Request and Response
 
 const resGetFeedDtoKcal: GetFeedAmountResDto = {
-  rer: 130,
-  der: 325,
-  amount: 80,
+  rer: 118,
+  der: 295,
+  amount: 72,
 };
 
 const resGetFeedDtoFeedId: GetFeedAmountResDto = {
-  rer: 130,
-  der: 325,
-  amount: 87,
+  rer: 118,
+  der: 295,
+  amount: 79,
 };
 
 const mockRepositoryFindOneKcal = {

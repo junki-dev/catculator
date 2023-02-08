@@ -15,7 +15,7 @@ export const getFeedAmount = async (req: Request, res: Response) => {
 
     const resDto: GetFeedAmountResDto = await catculatorService.getFeedAmount(dto);
 
-    commonResponse(res, ResultCode.SUCCESS, resDto);
+    commonResponse(res, ResultCode.SUCCESS, { info: resDto });
   } catch (err) {
     errorResponse(res, err as IResponse);
   }

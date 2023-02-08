@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { IsDateString, IsInt, IsNumber, IsOptional } from 'class-validator';
 
 export class GetFeedAmountReqDto {
-  @IsInt()
+  @IsNumber()
   @Type(() => Number)
   weight: number;
 
@@ -14,7 +14,7 @@ export class GetFeedAmountReqDto {
   energyRequirements: number;
 
   @IsOptional()
-  @IsInt()
+  @IsNumber()
   @Type(() => Number)
   kcal: number;
 
