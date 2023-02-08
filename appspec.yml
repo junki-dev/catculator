@@ -1,0 +1,19 @@
+version: 0.0 # 버전
+os: linux # 실행 OS
+
+files: # 배포의 설치 이벤트 동안 인스턴스에 설치할 파일 정보
+  - source: /
+    destination: /home/ec2-user/catculator
+
+file_exists_behavior: OVERWRITE # 이전 버전 파일 처분 방법
+
+permissions: # files section 파일 권한 설정
+  - object: /home/ec2-user/catculator
+    owner: ec2-user
+    group: ec2-user
+
+# 각 배포 단계에 따른 스크립트 설정
+hooks:
+  ApplicationStart:
+    - location: scripts/application_start.sh
+      timeout: 60

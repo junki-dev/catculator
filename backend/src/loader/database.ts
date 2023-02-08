@@ -1,6 +1,8 @@
 import { getConfig } from '@config/index';
 import { IConfig } from '@config/interface';
+
 import { Logger } from '@src/common';
+import { Feed } from '@feed/model/feed.entity';
 import { DataSource } from 'typeorm';
 
 const {
@@ -20,7 +22,7 @@ export class Database {
       database: name,
       username: userName,
       password: userPassword,
-      entities: ['src/**/model/*.ts'],
+      entities: [Feed],
     });
   }
 
