@@ -1,0 +1,151 @@
+name: CD Catculator Server
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+  # 테스트용입니다.
+  # push:
+  #   branches:
+  #     - be/**
+  #     - fe/**
+  #     - cm/**
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+
+    name: Deploy Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        node-version: [18.12.1]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Make service BE envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_PORT: ${{ secrets.PORT }}
+          envkey_LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+          envkey_DB_HOST: ${{ secrets.DB_HOST }}
+          envkey_DB_PORT: ${{ secrets.DB_PORT }}
+          envkey_DB_NAME: ${{ secrets.DB_NAME }}
+          envkey_DB_USER_NAME: ${{ secrets.DB_USER_NAME }}
+          envkey_DB_USER_PASSWORD: ${{ secrets.DB_USER_PASSWORD }}
+          envkey_ENV: ${{ secrets.ENV }}
+          directory: backend
+          file_name: .env
+
+      - name: Make service FE envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_REACT_APP_API: ${{ secrets.REACT_APP_API }}
+          directory: frontend
+          file_name: .env
+
+      # 소스코드 압축
+      - name: Make tar file
+        run: |
+          cd ..
+          tar -zcvf ${{ secrets.TAR_FILE_NAME }} ./catculator
+
+        # AWS credential 설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRETS }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # S3에 tar 압축파일 업로드
+      - name: Upload to S3
+        run: |
+          cd ..
+          aws s3 cp --region ${{ secrets.AWS_REGION }} --acl private ./${{ secrets.TAR_FILE_NAME }} s3://${{ secrets.AWS_S3_BUCKET }}
+
+      # 배포 생성
+      - name: Create CodeDeploy Deployment
+        id: deploy
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ secrets.AWS_CODEDEPLOY_APP }} \
+            --deployment-group-name ${{ secrets.AWS_CODEDEPLOY_GROUP }}  \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --s3-location bucket=${{ secrets.AWS_S3_BUCKET }},bundleType=tgz,key=${{ secrets.TAR_FILE_NAME }}
+
+  # deploy:
+  #   name: Deploy Service
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 15
+
+  #   strategy:
+  #     matrix:
+  #       node-version: [18.12.1]
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Use Node.js ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+
+  #     - name: Make service BE envfile
+  #       uses: SpicyPizza/create-envfile@v1.3
+  #       with:
+  #         envkey_PORT: ${{ secrets.PORT }}
+  #         envkey_LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+  #         envkey_DB_HOST: ${{ secrets.DB_HOST }}
+  #         envkey_DB_PORT: ${{ secrets.DB_PORT }}
+  #         envkey_DB_NAME: ${{ secrets.DB_NAME }}
+  #         envkey_DB_USER_NAME: ${{ secrets.DB_USER_NAME }}
+  #         envkey_DB_USER_PASSWORD: ${{ secrets.DB_USER_PASSWORD }}
+  #         envkey_ENV: ${{ secrets.ENV }}
+  #         directory: backend
+  #         file_name: .env
+
+  #     - name: Make service FE envfile
+  #       uses: SpicyPizza/create-envfile@v1.3
+  #       with:
+  #         envkey_REACT_APP_API: ${{ secrets.REACT_APP_API }}
+  #         directory: frontend
+  #         file_name: .env
+
+  #     # 소스코드 압축
+  #     - name: Make tar file
+  #       run: |
+  #         cd ..
+  #         tar -zcvf ${{ secrets.TAR_FILE_NAME }} ./catculator
+
+  #       # AWS credential 설정
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+  #         aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRETS }}
+  #         aws-region: ${{ secrets.AWS_REGION }}
+
+  #     # S3에 tar 압축파일 업로드
+  #     - name: Upload to S3
+  #       run: |
+  #         cd ..
+  #         aws s3 cp --region ${{ secrets.AWS_REGION }} --acl private ./${{ secrets.TAR_FILE_NAME }} s3://${{ secrets.AWS_S3_BUCKET }}
+
+  #     # 배포 생성
+  #     - name: Create CodeDeploy Deployment
+  #       id: deploy
+  #       run: |
+  #         aws deploy create-deployment \
+  #           --application-name ${{ secrets.AWS_CODEDEPLOY_APP }} \
+  #           --deployment-group-name ${{ secrets.AWS_CODEDEPLOY_GROUP }}  \
+  #           --deployment-config-name CodeDeployDefault.OneAtATime \
+  #           --s3-location bucket=${{ secrets.AWS_S3_BUCKET }},bundleType=tgz,key=${{ secrets.TAR_FILE_NAME }}

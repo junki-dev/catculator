@@ -1,0 +1,71 @@
+name: catculator test coverage
+
+on:
+  pull_request:
+    branches: ["main", "develop", "be/**"]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    strategy:
+      matrix:
+        node-version: [18.12.1]
+
+    env:
+      ACCESS_TOKEN: "${{ secrets.GH_ACCESS_TOKEN }}"
+
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+          ref: refs/heads/${{ github.head_ref }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Make service envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_PORT: ${{ secrets.PORT }}
+          envkey_LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+          envkey_ENV: ${{ secrets.ENV }}
+          directory: backend
+          file_name: .env
+
+      - name: Run tests
+        run: |
+          cd backend
+          yarn test:sum
+
+      - name: Make badges
+        run: |
+          cd backend
+          yarn test:bad
+
+      - name: Check if there is any new translations
+        id: verify_diff
+        run: |
+          cd backend
+          git diff --quiet README.md || echo "::set-output name=new_translations_exist::true"
+
+      - name: Commit files
+        if: steps.verify_diff.outputs.new_translations_exist == 'true'
+        run: |
+          git config remote.origin.url https://github.com/genesisnest/uranus-staking-server.git
+          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
+          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
+          git add README.md
+          git commit -am "docs: update test coverage badges on README"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          branch: ${{ github.head_ref }}
