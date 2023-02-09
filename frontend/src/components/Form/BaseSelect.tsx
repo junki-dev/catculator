@@ -1,6 +1,8 @@
 /** @jsxImportSource @emotion/react */
+import TypographyError from '../Typography/TypographyError';
+
 import { Box, css, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Control, Controller, FieldError, FieldValues, Path } from 'react-hook-form';
 
 interface BaseSelectProps<T extends FieldValues> {
   control: Control<T, any>;
@@ -9,6 +11,7 @@ interface BaseSelectProps<T extends FieldValues> {
   id: string;
   items: IMenuItem[];
   isRequired?: boolean;
+  errors?: FieldError;
 }
 
 export interface IMenuItem {
@@ -23,6 +26,7 @@ export default function BaseSelect<T extends FieldValues>({
   id,
   items,
   isRequired = false,
+  errors,
 }: BaseSelectProps<T>) {
   return (
     <Box
@@ -50,6 +54,9 @@ export default function BaseSelect<T extends FieldValues>({
               })}
               id={id}
             >
+              <MenuItem value="">
+                <em>—</em>
+              </MenuItem>
               {items.map((item, idx) => (
                 <MenuItem key={`base-select-item-${idx}-${item.value}`} value={item.value}>
                   {item.name}
@@ -58,6 +65,7 @@ export default function BaseSelect<T extends FieldValues>({
             </Select>
           )}
         />
+        <TypographyError text={errors ? errors.message : ''} />
       </FormControl>
     </Box>
   );
