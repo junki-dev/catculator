@@ -8,16 +8,17 @@ import ResultBox from '../components/ResultBox';
 import { useFeedList } from '../hooks/query/feed';
 import { getLivedMonth } from '../utils';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import CalculateRoundedIcon from '@mui/icons-material/CalculateRounded';
 import { LoadingButton } from '@mui/lab';
 import { Avatar, Box, css, CssBaseline, Collapse, List, ListItem, Typography } from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import { Big } from 'big.js';
 import dayjs from 'dayjs';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { TransitionGroup } from 'react-transition-group';
-
+import * as yup from 'yup';
 interface IFormInputs {
   weight: string;
   birthday: Date;
@@ -52,25 +53,6 @@ const energyList: IMenuItem[] = [
   { value: 3, name: '3 | 임신 수유증' },
 ];
 
-function renderItem({ label, value, unit }: IInfo) {
-  return (
-    <ListItem>
-      <Typography
-        css={css({ margin: '1rem 0 0 0', fontWeight: 'bold' })}
-        variant="body1"
-        color="text.secondary"
-        align="center"
-      >
-        <span>{`우리 고양이 `}</span>
-        <span css={css({ color: '#A074C3' })}>{`${label} `}</span>
-        <span>{`은(는) `}</span>
-        <span css={css({ color: '#CA6C50' })}>{`${value}${unit} `}</span>
-        <span>{`입니다.`}</span>
-      </Typography>
-    </ListItem>
-  );
-}
-
 export default function Catculator() {
   // useState
   const [amount, setAmount] = useState<number>();
@@ -88,14 +70,35 @@ export default function Catculator() {
   }, [data]);
   const [moreInfos, setMoreInfos] = useState<IInfo[]>([]);
 
+  const schema = yup.object().shape(
+    {
+      weight: yup.string().required('몸무게(kg)를 입력해주세요.'),
+      birthday: yup.date().required(),
+      energyReq: yup.string().required('에너지 요구량을 선택해주세요.'),
+      kcal: yup.string().when('feed', {
+        is: '',
+        then: yup.string().required('급여중인 사료의 kcal를 입력하거나, 아래 [사료]에서 사료를 선택하세요.'),
+      }),
+      feed: yup.string().when('kcal', {
+        is: '',
+        then: yup.string().required('급여중인 사료를 선택하거나, 위의 [사료 칼로리]에 직접 입력해주세요.'),
+        otherwise: yup.string().notRequired(),
+      }),
+    },
+    [['kcal', 'feed']],
+  );
+
   // useForm
   const {
     handleSubmit,
     control,
     reset,
-    formState: { errors },
+    clearErrors,
+    formState: { errors, isValid },
   } = useForm<IFormInputs>({
     defaultValues: { weight: '', birthday: new Date(), energyReq: '', kcal: '', feed: '' },
+    resolver: yupResolver(schema),
+    mode: 'onChange',
   });
 
   // useCallback
@@ -147,6 +150,33 @@ export default function Catculator() {
     }, 1000);
   };
 
+  // render more infos
+  const renderItem = ({ label, value, unit }: IInfo) => {
+    return (
+      <ListItem>
+        <Typography
+          css={css({ margin: '1rem 0 0 0', fontWeight: 'bold' })}
+          variant="body1"
+          color="text.secondary"
+          align="left"
+        >
+          <span>{`우리 고양이 `}</span>
+          <span css={css({ color: '#A074C3' })}>{`${label} `}</span>
+          <span>{`은(는) `}</span>
+          <span css={css({ color: '#CA6C50' })}>{`${value}${unit} `}</span>
+          <span>{`입니다.`}</span>
+        </Typography>
+      </ListItem>
+    );
+  };
+
+  // useEffect
+  useEffect(() => {
+    if (isValid) {
+      clearErrors();
+    }
+  }, [isValid]);
+
   return (
     <Box
       sx={{
@@ -182,6 +212,7 @@ export default function Catculator() {
           id="weight"
           isFocus={true}
           isRequired={true}
+          errors={errors.weight}
         />
         <BaseDatePicker control={control} name="birthday" label="생일" />
         <BaseSelect
@@ -191,15 +222,19 @@ export default function Catculator() {
           id="energyReq"
           items={energyList}
           isRequired={true}
+          errors={errors.energyReq}
         />
-        <BaseTextField control={control} name="kcal" label="사료 칼로리(kcal/kg)" id="kcal" />
-        <BaseSelect control={control} name="feed" label="사료" id="feed" items={feedList} />
+
+        <BaseTextField control={control} name="kcal" label="사료 칼로리(kcal/kg)" id="kcal" errors={errors?.kcal} />
+        <BaseSelect control={control} name="feed" label="사료" id="feed" items={feedList} errors={errors.feed} />
+
         <LoadingButton
           type="submit"
           fullWidth
           variant="contained"
           sx={{ mt: 3, color: '#ffffff', fontWeight: 'bold', fontSize: '1.1rem' }}
           loading={isLoading}
+          disabled={!isValid}
         >
           계산하기
         </LoadingButton>
@@ -221,7 +256,7 @@ export default function Catculator() {
         </Grid2>
       </Box>
 
-      <Box sx={{ mt: 1, width: '25%', minWidth: '1rem' }}>
+      <Box sx={{ mt: 1, width: '27%', minWidth: '17rem' }}>
         <List>
           <TransitionGroup>
             {moreInfos.map((info) => (

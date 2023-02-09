@@ -1,5 +1,5 @@
 import HorizontalDivider from '../components/HorizontalDivider';
-import TypographyBody from '../components/TypographyBody';
+import TypographyBody from '../components/Typography/TypographyBody';
 
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import GitHubIcon from '@mui/icons-material/GitHub';
